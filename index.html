@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunergy Solar - Attendance System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .login-container {
+            background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Login Section -->
+    <div id="loginSection" class="min-h-screen login-container flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-800">Sunergy Solar</h1>
+                <p class="text-gray-600">Attendance Management System</p>
+            </div>
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-gray-700">User Type</label>
+                    <select id="userType" class="w-full p-3 border rounded-lg">
+                        <option value="employee">Employee</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Username</label>
+                    <input type="text" id="username" class="w-full p-3 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Password</label>
+                    <input type="password" id="password" class="w-full p-3 border rounded-lg">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="hidden">
+        <!-- Navigation -->
+        <nav class="bg-blue-600 text-white p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-xl font-bold">Sunergy Solar Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="userInfo"></span>
+                    <button onclick="logout()" class="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container mx-auto p-4">
+            <!-- Employee Dashboard -->
+            <div id="employeeDashboard" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Mark Attendance</h2>
+                        <button id="markAttendanceBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            Mark Present
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Request Leave</h2>
+                        <form id="leaveRequestForm" class="space-y-4">
+                            <input type="date" id="leaveDate" class="w-full p-2 border rounded">
+                            <textarea id="leaveReason" placeholder="Reason for leave" class="w-full p-2 border rounded"></textarea>
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                Submit Request
+                            </button>
+                        </form>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Salary Information</h2>
+                        <div class="space-y-2">
+                            <p>Current Month Attendance: <span id="currentAttendance">0</span> days</p>
+                            <p>Expected Salary: ₹<span id="expectedSalary">0</span></p>
+                            <p>Advance Taken: ₹<span id="advanceTaken">0</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div id="adminDashboard" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Employee Management</h2>
+                        <div class="space-y-4">
+                            <button onclick="showAddEmployeeModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                Add New Employee
+                            </button>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="p-2">Name</th>
+                                            <th class="p-2">Daily Rate</th>
+                                            <th class="p-2">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="employeeList">
+                                        <!-- Employee list will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Leave Requests</h2>
+                        <div id="leaveRequests" class="space-y-4">
+                            <!-- Leave requests will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manager Dashboard -->
+            <div id="managerDashboard" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Team Attendance</h2>
+                        <div id="teamAttendance" class="space-y-4">
+                            <!-- Team attendance will be populated here -->
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-4">Leave Approvals</h2>
+                        <div id="managerLeaveRequests" class="space-y-4">
+                            <!-- Leave requests will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock data for demonstration
+        const users = {
+            admin: { username: 'admin', password: 'admin123', type: 'admin' },
+            manager: { username: 'manager', password: 'manager123', type: 'manager' },
+            employee: { username: 'employee', password: 'employee123', type: 'employee' }
+        };
+
+        let currentUser = null;
+
+        // Login handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+
+            if (users[userType] && users[userType].username === username && users[userType].password === password) {
+                currentUser = users[userType];
+                showDashboard(userType);
+            } else {
+                alert('Invalid credentials!');
+            }
+        });
+
+        function showDashboard(userType) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            document.getElementById('userInfo').textContent = `Welcome, ${userType}`;
+
+            // Hide all dashboards first
+            document.getElementById('employeeDashboard').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('managerDashboard').classList.add('hidden');
+
+            // Show relevant dashboard
+            document.getElementById(`${userType}Dashboard`).classList.remove('hidden');
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Employee functions
+        document.getElementById('markAttendanceBtn').addEventListener('click', function() {
+            const today = new Date().toLocaleDateString();
+            alert(`Attendance marked for ${today}`);
+            updateAttendanceCount();
+        });
+
+        document.getElementById('leaveRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const date = document.getElementById('leaveDate').value;
+            const reason = document.getElementById('leaveReason').value;
+            alert(`Leave request submitted for ${date}`);
+            this.reset();
+        });
+
+        function updateAttendanceCount() {
+            document.getElementById('currentAttendance').textContent = '15';
+            document.getElementById('expectedSalary').textContent = '7500';
+            document.getElementById('advanceTaken').textContent = '1000';
+        }
+
+        // Initialize mock data
+        updateAttendanceCount();
+
+        // Responsive design considerations are handled by Tailwind CSS classes
+        // The layout will adjust automatically for different screen sizes
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
